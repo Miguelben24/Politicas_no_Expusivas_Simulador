@@ -1,0 +1,9 @@
+
+# Formato: Nombre, T.Llegada, Duracion
+
+
+4
+P0,0,6
+P1,1,1
+P2,3,9
+P3,5,2

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planificador de Procesos</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Título -->
+  <h1>
+    Planificador de Proceso
+    <span>FCFS – SJF(SPN) → Políticas no Expulsivas</span>
+  </h1>
+
+  <!-- Layout dos columnas -->
+  <div class="layout">
+
+    <!-- part.izqui -->
+    <div>
+
+      <!-- Configuración -->
+      <div class="section">
+        <div class="section-title">• Configuración</div>
+
+        <div class="config-row">
+          <label>1. Política de Planificación</label>
+        </div>
+        <select id="policy">
+          <option value="fcfs">FCFS</option>
+          <option value="sjf">SJF / SPN</option>
+        </select>
+
+        <!-- Subir archivo -->
+        <div style="margin-top: 14px;">
+          <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">
+            2. Subir Archivo TXT
+          </div>
+          <div class="file-zone">
+            <input type="file" id="fileInput" accept=".txt,.csv" onchange="loadFile(event)">
+            <p>Haz clic o arrastra tu archivo .TXT aquí</p>
+            <div class="fname" id="fileName">—</div>
+          </div>
+        </div>
+
+        <!-- Tabla que aparece al subir -->
+        <div id="tableArea"></div>
+
+        <!-- Botón simular -->
+        <button class="btn-simular" id="btnSim" onclick="simulate()" disabled>
+          Simular
+        </button>
+      </div>
+
+    </div>
+
+    <!-- part.derecha-->
+    <div>
+
+      <!-- Diagrama de Gantt -->
+      <div class="section" style="margin-bottom: 16px;">
+        <div class="section-title" id="ganttTitle">Diagrama de Gantt</div>
+        <div class="gantt-scroll" id="ganttArea">
+          <div class="placeholder">Aquí aparecerá el diagrama</div>
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="section">
+        <div class="section-title">Resultados</div>
+        <div style="overflow-x: auto;">
+          <table class="results-table" id="resultsTable">
+            <tbody>
+              <tr><td colspan="7" style="text-align:center; color:#bbb; font-style:italic; border:none; background:#f5f5f5;">
+                Aquí aparecerán los resultados
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="avg-row" id="avgCards"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/algoritmos.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
