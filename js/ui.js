@@ -36,14 +36,18 @@ function parseFile(text) {
   if (lines.length < n + 1)
     return { error: `Se esperan ${n} procesos pero solo hay ${lines.length - 1} líneas.` };
 
+  
+
   const procs = [];
   for (let i = 1; i <= n; i++) {
     const parts = lines[i].split(/[,;\t ]+/);
     if (parts.length < 3) return { error: `Error en línea ${i + 1}: "${lines[i]}"` };
     const arrival = parseFloat(parts[1]);
     const burst   = parseFloat(parts[2]);
-    if (isNaN(arrival) || isNaN(burst) || burst <= 0)
-      return { error: `Datos inválidos en la línea ${i + 1}.` };
+    if (isNaN(arrival) || arrival < 0)
+      return { error: `Error en línea ${i + 1}: el Tiempo de Llegada no puede ser negativo ("${parts[1]}").` };
+    if (isNaN(burst) || burst <= 0)
+      return { error: `Error en línea ${i + 1}: la Duración debe ser mayor a cero ("${parts[2]}").` };
     procs.push({ id: parts[0] || 'P' + (i - 1), arrival, burst, color: COLORS[i - 1] });
   }
   return { procs };
