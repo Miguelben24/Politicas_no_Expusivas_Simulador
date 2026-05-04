@@ -11,7 +11,7 @@
   <!-- Título -->
   <h1>
     Planificador de Proceso
-    <span>FCFS – SJF(SPN) → Políticas no Expulsivas</span>
+    <span>FCFS · SJF · SRT · RR  — Planificación CPU dinámica</span>
   </h1>
 
   <!-- Layout dos columnas -->
@@ -26,11 +26,17 @@
 
         <div class="config-row">
           <label>1. Política de Planificación</label>
+          <select id="policy" onchange="onPolicyChange()">
+            <option value="fcfs">FCFS</option>
+            <option value="sjf">SJF / SPN</option>
+            <option value="srt">SRT (Shortest Remaining Time)</option>
+            <option value="rr">RR (Round Robin)</option>
+          </select>
         </div>
-        <select id="policy">
-          <option value="fcfs">FCFS</option>
-          <option value="sjf">SJF / SPN</option>
-        </select>
+        <div class="config-row" id="quantumRow" style="display:none;">
+          <label>Quantum RR</label>
+          <input type="number" id="quantumInput" min="1" step="1" value="2">
+        </div>
 
         <!-- Subir archivo -->
         <div style="margin-top: 14px;">
@@ -79,6 +85,15 @@
           </table>
         </div>
         <div class="avg-row" id="avgCards"></div>
+        <div class="avg-row" id="cpuUtilization"></div>
+        <div class="avg-row" id="simulationInfo"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Registro de Ejecución</div>
+        <div class="trace-box" id="traceArea">
+          <div class="trace-line trace-placeholder">Después de simular se mostrará el paso a paso del algoritmo.</div>
+        </div>
       </div>
 
     </div>

@@ -46,7 +46,7 @@ h1 span { font-size: 13px; color: #c0392b; font-weight: bold; display: block; ma
 
 .config-row label { font-size: 13px; font-weight: bold; white-space: nowrap; }
 
-select {
+select, input[type="number"] {
   padding: 5px 10px;
   font-size: 13px;
   border: 1px solid #bbb;
@@ -54,6 +54,12 @@ select {
   background: #fff;
   cursor: pointer;
 }
+
+input[type="number"] { width: 80px; }
+
+.info-card { flex: 1; min-width: 120px; background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 10px 14px; text-align: center; }
+.info-card .val { font-size: 18px; font-weight: bold; color: #1a5fb4; }
+.info-card .lbl { font-size: 11px; color: #777; margin-top: 4px; }
 
 .file-zone {
   border: 2px dashed #aaa;
@@ -120,5 +126,9 @@ select {
 .avg-card { flex: 1; min-width: 100px; background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 8px 12px; text-align: center; }
 .avg-card .val { font-size: 20px; font-weight: bold; color: #1a5fb4; }
 .avg-card .lbl { font-size: 10px; color: #777; margin-top: 2px; }
+
+.trace-box { max-height: 240px; overflow-y: auto; background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 12px; line-height: 1.5; }
+.trace-line { margin-bottom: 6px; color: #333; }
+.trace-placeholder { color: #888; font-style: italic; }
 
 .placeholder { display: flex; align-items: center; justify-content: center; min-height: 120px; color: #bbb; font-size: 13px; font-style: italic; border: 1px dashed #ccc; border-radius: 5px; }

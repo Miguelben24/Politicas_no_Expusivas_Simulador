@@ -69,26 +69,57 @@ let currentTimeline = [];
 let currentPolicy = '';
 let currentMetrics = [];
 
+function onPolicyChange() {
+  const policy = document.getElementById('policy').value;
+  const quantumRow = document.getElementById('quantumRow');
+  quantumRow.style.display = policy === 'rr' ? 'flex' : 'none';
+}
+
+window.addEventListener('load', onPolicyChange);
+
 //boton_simular
 function simulate() {
   if (!processes.length) return;
 
-  const policy   = document.getElementById('policy').value;
-  const timeline = policy === 'fcfs' ? fcfs(processes) : sjf(processes);
-  const metrics  = computeMetrics(processes, timeline);
+  const policy = document.getElementById('policy').value;
+  const quantum = parseInt(document.getElementById('quantumInput').value, 10) || 1;
+  const startTime = performance.now();
+
+  let result;
+  if (policy === 'fcfs') result = fcfs(processes);
+  else if (policy === 'sjf') result = sjf(processes);
+  else if (policy === 'srt') result = srt(processes);
+  else if (policy === 'rr') result = rr(processes, quantum);
+  else result = fcfs(processes);
+
+  const durationMs = performance.now() - startTime;
+  const timeline = result.timeline;
+  const trace = result.trace || [];
+  const metrics = computeMetrics(processes, timeline);
+  const util = computeCpuUtilization(timeline);
 
   currentTimeline = timeline;
   currentPolicy = policy;
   currentMetrics = metrics;
 
   renderGantt(timeline, policy);
-  renderResults(metrics);
+  renderResults(metrics, util);
+  renderTrace(trace, policy);
+  renderSimulationInfo(util, durationMs, policy, quantum);
+}
+
+function computeCpuUtilization(timeline) {
+  if (!timeline.length) return {util: 0, busy: 0, total: 0};
+  const total = Math.max(...timeline.map(s => s.end));
+  const busy = timeline.reduce((sum, slot) => slot.id !== 'IDLE' ? sum + (slot.end - slot.start) : sum, 0);
+  const util = total ? (busy / total) * 100 : 0;
+  return {util: parseFloat(util.toFixed(2)), busy: parseFloat(busy.toFixed(2)), total: parseFloat(total.toFixed(2))};
 }
 
 //diagramaa_gantt
 function renderGantt(timeline, policy) {
   const maxT      = Math.max(...timeline.map(s => s.end));
-  const pxPerUnit = Math.min(38, Math.max(8, 500 / maxT));
+  const pxPerUnit = Math.min(38, Math.max(6, 700 / maxT));
   const ids       = [...new Set(timeline.map(s => s.id))];
 
   let html = '';
@@ -115,7 +146,7 @@ function renderGantt(timeline, policy) {
   }
   html += '</div>';
 
-  const label = policy === 'fcfs' ? 'FCFS' : 'SJF / SPN';
+  const label = policy === 'fcfs' ? 'FCFS' : policy === 'sjf' ? 'SJF / SPN' : policy === 'srt' ? 'SRT' : 'RR';
   document.getElementById('ganttArea').innerHTML = html + '<div style="text-align: center; margin-top: 10px;"><button class="btn-full" onclick="openFullGantt()">Ver en ventana completa</button></div>';
 
   // Animar el diagrama
@@ -152,7 +183,8 @@ function openFullGantt() {
   const pxPerUnit = 20; // Tamaño fijo más grande para mejor visibilidad
   const ids = [...new Set(timeline.map(s => s.id))];
 
-  let html = '<h2 style="text-align: center;">Diagrama de Gantt — ' + (policy === 'fcfs' ? 'FCFS' : 'SJF / SPN') + '</h2>';
+  const policyLabel = policy === 'fcfs' ? 'FCFS' : policy === 'sjf' ? 'SJF / SPN' : policy === 'srt' ? 'SRT' : 'RR';
+  let html = '<h2 style="text-align: center;">Diagrama de Gantt — ' + policyLabel + '</h2>';
   html += '<div style="overflow-x: auto; padding: 20px;">';
 
   ids.forEach(id => {
@@ -236,7 +268,7 @@ function openFullGantt() {
 }
 
 //resultadossss
-function renderResults(metrics) {
+function renderResults(metrics, util) {
   let html = `<thead><tr>
     <th>Proceso</th><th>T. Llegada</th><th>Duración</th>
     <th>T. Inicio</th><th>T. Final</th>
@@ -261,4 +293,36 @@ function renderResults(metrics) {
   document.getElementById('avgCards').innerHTML = `
     <div class="avg-card"><div class="val">${avgTR}</div><div class="lbl">Prom. T. Retorno</div></div>
     <div class="avg-card"><div class="val">${avgTE}</div><div class="lbl">Prom. T. Espera</div></div>`;
+
+  document.getElementById('cpuUtilization').innerHTML = `
+    <div class="info-card"><div class="val">${util.util}%</div><div class="lbl">CPU Utilización</div></div>
+    <div class="info-card"><div class="val">${util.busy}</div><div class="lbl">Tiempo ocupado</div></div>
+    <div class="info-card"><div class="val">${util.total}</div><div class="lbl">Tiempo total</div></div>`;
+}
+
+function renderTrace(trace, policy) {
+  const container = document.getElementById('traceArea');
+  if (!container) return;
+  if (!trace.length) {
+    container.innerHTML = '<div class="trace-line trace-placeholder">No hay pasos registrados.</div>';
+    return;
+  }
+  let html = '';
+  trace.forEach(line => {
+    html += `<div class="trace-line">${line}</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderSimulationInfo(util, durationMs, policy, quantum) {
+  const info = [];
+  info.push({ label: 'Tiempo de cálculo', value: `${durationMs.toFixed(2)} ms` });
+  info.push({ label: 'Política', value: policy.toUpperCase() });
+  if (policy === 'rr') info.push({ label: 'Quantum', value: quantum });
+  info.push({ label: 'Utilización CPU', value: `${util.util}%` });
+
+  const html = info.map(item => `
+    <div class="info-card"><div class="val">${item.value}</div><div class="lbl">${item.label}</div></div>`
+  ).join('');
+  document.getElementById('simulationInfo').innerHTML = html;
 }
